@@ -59,7 +59,7 @@ public class SettingsManager : MonoBehaviour
 
     public void onSliderChanged(Slider slider)
     {
-        float value = slider.value;
+        float value = slider.value/10;
         Debug.Log("onSliderChanged:" + value);
 
         foreach (var glyph in scatterplotGenerator.getGlyphList())
@@ -90,7 +90,7 @@ public class SettingsManager : MonoBehaviour
     public void onChangeScale(Slider slider)
     {
 
-        float newScaleFactor = slider.value;
+        float newScaleFactor = slider.value/100;
         Vector3 scalingVector = new Vector3(newScaleFactor, newScaleFactor, newScaleFactor) - previousScale;
         previousScale = new Vector3(newScaleFactor, newScaleFactor, newScaleFactor);
 

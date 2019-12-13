@@ -8,9 +8,9 @@ public class RayCastSelector : MonoBehaviour
     public float rayCasteRange = 50f;                                   // Distance in Unity units over which the player can fire
     public Transform rayShooterPosition;                                // Holds a reference to the end of ray shooter, marking the muzzle location of the shooter
     public Camera fpsCam;                                               // Holds a reference to the first person camera
-    //public GameObject plotObject;
+    public GameObject controller;
+    public GameObject toolTip;
 
-    
     private LineRenderer laserLine;                                     // Reference to the LineRenderer component which will display our laserline
     private Color previousGameObjectColor;
     private GameObject previousGameObject;
@@ -21,6 +21,14 @@ public class RayCastSelector : MonoBehaviour
         laserLine = GetComponent<LineRenderer>();
         // Get and store a reference to our Camera by searching this GameObject and its parents
         fpsCam = GetComponentInParent<Camera>();
+
+        Debug.Log("controller:" + controller == null);
+        Debug.Log("GraphGen:" + controller.transform.Find("plotPrefab").gameObject == null);
+        Debug.Log("toolTip:" + toolTip == null);
+        Debug.Log("text:" + toolTip.GetComponent<TextMesh>().text);
+        toolTip = controller.transform.Find("GraphGen").gameObject.transform.Find("Tooltip").gameObject;
+        
+
     }
 
 
