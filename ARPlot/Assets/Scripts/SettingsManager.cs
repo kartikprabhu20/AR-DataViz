@@ -38,8 +38,6 @@ public class SettingsManager : MonoBehaviour
     public void setScatterPlotGenerator(ScatterplotGenerator scatterplotGen)
     {
         scatterplotGenerator = scatterplotGen;
-        Debug.Log("setScatterPlotGenerator: " + scatterplotGenerator.getGlyphList().Count);
-        Debug.Log("setScatterPlotGenerator: " + scatterplotGenerator == null);
     }
 
     public ScatterplotGenerator getScatterPlotGenerator()
@@ -59,15 +57,20 @@ public class SettingsManager : MonoBehaviour
 
     public void onSliderChanged(Slider slider)
     {
-        float value = slider.value/10;
-        Debug.Log("onSliderChanged:" + value);
+        StartCoroutine(changeTransparency(slider));
+    }
 
+    public IEnumerator changeTransparency(Slider slider)
+    {
+        float value = slider.value / 10;
+        //Debug.Log("onSliderChanged:" + value);
+
+        int i = 0;
         foreach (var glyph in scatterplotGenerator.getGlyphList())
         {
-            Debug.Log("Slider value:" + value + " Gameobject position:" + glyph.transform.position);
-
-
-            Debug.Log("Current value:" + glyph.GetComponentInChildren<MeshRenderer>().material.color.a);
+            i++;
+            //Debug.Log("Slider value:" + value + " Gameobject position:" + glyph.transform.position);
+            //Debug.Log("Current value:" + glyph.GetComponentInChildren<MeshRenderer>().material.color.a);
 
             Renderer transparentRenderer = glyph.GetComponent<Renderer>();
 
@@ -77,30 +80,41 @@ public class SettingsManager : MonoBehaviour
             meshColor.a = value;
             //Apply the new color to the material
             transparentRenderer.material.color = meshColor;
-
+            if (i % 30 == 0)
+            {
+                yield return 0;
+            }
             //var col = gameObject.GetComponentInChildren<MeshRenderer>().material.color;
             //col.a = value;
         }
     }
 
 
-   
-    private Vector3 previousScale = new Vector3(0,0,0);
+    private Vector3 previousScale = new Vector3(0, 0, 0);
 
     public void onChangeScale(Slider slider)
     {
+        StartCoroutine(changeScale(slider));
+    }
 
-        float newScaleFactor = slider.value/100;
+    public IEnumerator changeScale(Slider slider)
+    {
+         float newScaleFactor = slider.value/100;
         Vector3 scalingVector = new Vector3(newScaleFactor, newScaleFactor, newScaleFactor) - previousScale;
         previousScale = new Vector3(newScaleFactor, newScaleFactor, newScaleFactor);
 
-        Debug.Log("onSliderChanged:" + newScaleFactor);
+        //Debug.Log("onSliderChanged:" + newScaleFactor);
 
+        int i = 0;
         foreach (var glyph in scatterplotGenerator.getGlyphList())
         {
-            Debug.Log("Slider value:" + newScaleFactor + " Gameobject scale:" + gameObject.transform.localScale);
-
+            i++;
+            //Debug.Log("Slider value:" + newScaleFactor + " Gameobject scale:" + gameObject.transform.localScale);
             glyph.transform.localScale += scalingVector;
+            if (i % 10 == 0)
+            {
+                yield return 0;
+            }
         }
     }
 }

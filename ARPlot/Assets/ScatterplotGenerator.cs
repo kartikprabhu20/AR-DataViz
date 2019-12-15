@@ -32,8 +32,8 @@ public class ScatterplotGenerator : MonoBehaviour
         dataPoints = reader.DataFrame;
         rowCount = reader.RowCount;
         columnCount = reader.ColumnCount;
-
-        CreateScatterplot();
+        StartCoroutine(CreateScatterplot(true));
+        StartCoroutine(CreateScatterplot(false));
     }
 
     public void assignPointsHolder(GameObject pointsHolderClone)
@@ -41,9 +41,8 @@ public class ScatterplotGenerator : MonoBehaviour
         pointsHolder = pointsHolderClone;
     }
 
-    void CreateScatterplot()
+    IEnumerator CreateScatterplot(bool split)
     {
-        int i = 0;
 
         float[] minValues = GetMinValues();
         float[] maxValues = GetMaxValues();
@@ -52,8 +51,13 @@ public class ScatterplotGenerator : MonoBehaviour
         Vector3 objectPosition;
         GameObject glyph;
 
+        int startIndex = split ? 0 : dataPoints.Length / 2;
+        int endIndex = split ? dataPoints.Length / 2 : dataPoints.Length;
+
+        int i = 0;
         foreach (DataReader.DataPoint point in dataPoints)
         {
+            i++;
             // normalize each data point
             float x = (point.X - xMin) / (xMax - xMin);
             float y = (point.Y - yMin) / (yMax - yMin);
@@ -63,8 +67,14 @@ public class ScatterplotGenerator : MonoBehaviour
 
 
             plotscale = pointsHolder.transform.parent.transform.localScale.x;
-            Vector3 offsetToZeroCoordinate = new Vector3(-0.5f * plotscale, 0f, -0.5f * plotscale) ; //(-0.5,0,-0.5) is ZeroCordinates for plane
-            objectPosition = (new Vector3(x, y, z) ) * plotscale + pointsHolder.transform.position + offsetToZeroCoordinate;
+            Vector3 offsetToZeroCoordinate = new Vector3(-0.5f * plotscale, 0f, -0.5f * plotscale); //(-0.5,0,-0.5) is ZeroCordinates for plane
+            objectPosition = (new Vector3(x, y, z)) * plotscale + pointsHolder.transform.position + offsetToZeroCoordinate;
+
+            if (i % 5 == 0)
+            {
+                yield return new WaitForSeconds(.000000001f);
+            }
+            //yield return new WaitForSeconds(.000000001f);
             glyph = Instantiate(defaultGlyph, objectPosition, Quaternion.identity);
 
             Debug.Log("before  ADD: " + glyph.transform.localScale);
@@ -79,7 +89,6 @@ public class ScatterplotGenerator : MonoBehaviour
             glyph.GetComponent<Renderer>().material.color = (colorFlag) ? Color.white : new Color(x, y, z);
 
             glyphList.Add(glyph);
-
         }
     }
 

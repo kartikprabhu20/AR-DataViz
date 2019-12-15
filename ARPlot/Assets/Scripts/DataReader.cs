@@ -27,7 +27,7 @@ public class DataReader: MonoBehaviour
 
     public void LoadData()
     {
-        string fileName = "iris"; // to be changed later, remove harcoded value
+        string fileName = "Iris"; // to be changed later, remove harcoded value
         bool is3DPlot = true; // to be passed to this function as a parameter
 
 
