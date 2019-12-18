@@ -215,12 +215,12 @@ public class Controller : Manipulator
 
                     selectionCanvas.SetActive(true);
 
-                    scatterPlotManager.GetComponent<ScatterplotGenerator>().assignPointsHolder(plotPrefab.transform.Find("PointsHolder").gameObject);
+                    //scatterPlotManager.GetComponent<ScatterplotGenerator>().assignPointsHolder(plotPrefab.transform.Find("PointsHolder").gameObject);
+                    scatterPlotManager.GetComponent<ScatterplotGenerator>().assignGraphGen(plotPrefab);
+
                     scatterPlotManager = Instantiate(scatterPlotManager);
 
                     settingsManager.GetComponent<SettingsManager>().setScatterPlotGenerator(scatterPlotManager.GetComponent<ScatterplotGenerator>()); 
-                    //print("plotprefab scale:" + plotPrefab.transform.localScale);
-
                     //Debug.Log("Glyph: " + settingsManager.GetComponent<SettingsManager>().getScatterPlotGenerator().getGlyphList().Count);
 
                 }

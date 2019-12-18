@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class ScatterplotGenerator : MonoBehaviour
 {
     public GameObject defaultGlyph; // 3D model to generate as a glyph
+    public GameObject graphGen;
     public GameObject pointsHolder; // Empty Parent to hold all the points, to avoid clutter
 
     [SerializeField]
@@ -15,8 +17,6 @@ public class ScatterplotGenerator : MonoBehaviour
 
     List<GameObject> glyphList = new List<GameObject>();
     int rowIndex = 0;
-    bool dropFlag = false;
-
     int rowCount, columnCount;
 
     float xMin, yMin, zMin;
@@ -28,20 +28,25 @@ public class ScatterplotGenerator : MonoBehaviour
     void Start()
     {
         reader.LoadData();
-
         dataPoints = reader.DataFrame;
         rowCount = reader.RowCount;
         columnCount = reader.ColumnCount;
-        StartCoroutine(CreateScatterplot(true));
-        StartCoroutine(CreateScatterplot(false));
+
+        StartCoroutine(CreateScatterplot());
     }
 
-    public void assignPointsHolder(GameObject pointsHolderClone)
+    //public void assignPointsHolder(GameObject pointsHolderClone)
+    //{
+    //    pointsHolder = pointsHolderClone;
+    //}
+
+    public void assignGraphGen(GameObject graphGenClone)
     {
-        pointsHolder = pointsHolderClone;
+        graphGen = graphGenClone;
+        pointsHolder = graphGen.transform.Find("PointsHolder").gameObject;
     }
 
-    IEnumerator CreateScatterplot(bool split)
+    IEnumerator CreateScatterplot()
     {
 
         float[] minValues = GetMinValues();
@@ -50,9 +55,6 @@ public class ScatterplotGenerator : MonoBehaviour
         SetMinMax(minValues, maxValues);
         Vector3 objectPosition;
         GameObject glyph;
-
-        int startIndex = split ? 0 : dataPoints.Length / 2;
-        int endIndex = split ? dataPoints.Length / 2 : dataPoints.Length;
 
         int i = 0;
         foreach (DataReader.DataPoint point in dataPoints)
@@ -66,7 +68,7 @@ public class ScatterplotGenerator : MonoBehaviour
             bool colorFlag = point.X == xMin || point.Y == yMin || point.Z == zMin || point.X == xMax || point.Y == yMax || point.Z == zMax;
 
 
-            plotscale = pointsHolder.transform.parent.transform.localScale.x;
+            plotscale = graphGen.transform.localScale.x;
             Vector3 offsetToZeroCoordinate = new Vector3(-0.5f * plotscale, 0f, -0.5f * plotscale); //(-0.5,0,-0.5) is ZeroCordinates for plane
             objectPosition = (new Vector3(x, y, z)) * plotscale + pointsHolder.transform.position + offsetToZeroCoordinate;
 
@@ -76,13 +78,10 @@ public class ScatterplotGenerator : MonoBehaviour
             }
             //yield return new WaitForSeconds(.000000001f);
             glyph = Instantiate(defaultGlyph, objectPosition, Quaternion.identity);
-
-            Debug.Log("before  ADD: " + glyph.transform.localScale);
-
             glyph.transform.localScale *= plotscale; // Scale of GraphGen 
-            Debug.Log("after  ADD: " + glyph.transform.localScale);
 
             glyph.name = "Data Point " + i++.ToString();
+            //Debug.Log("Glyph: " + glyph.name + " " + glyph.transform.localScale);
             glyph.transform.rotation = pointsHolder.transform.rotation;
             glyph.transform.parent = pointsHolder.transform;
 
@@ -91,16 +90,6 @@ public class ScatterplotGenerator : MonoBehaviour
             glyphList.Add(glyph);
         }
     }
-
-    void AnimateDisplay()
-    {
-        glyphList[rowIndex++].SetActive(true);
-        if(rowIndex == rowCount-1)
-        {
-            dropFlag = true;
-        } 
-    }
-
 
     float[] GetMinValues()
     {
@@ -172,5 +161,12 @@ public class ScatterplotGenerator : MonoBehaviour
         //Debug.Log("getGlyphList: " + glyphList.Count);
 
         return glyphList;
+    }
+
+    public GameObject getGraphGen()
+    {
+        //Debug.Log("getGlyphList: " + glyphList.Count);
+
+        return graphGen;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,8 +9,8 @@ public class RayCastSelector : MonoBehaviour
     public float rayCasteRange = 50f;                                   // Distance in Unity units over which the player can fire
     public Transform rayShooterPosition;                                // Holds a reference to the end of ray shooter, marking the muzzle location of the shooter
     public Camera fpsCam;                                               // Holds a reference to the first person camera
-    public GameObject controller;
-    public GameObject toolTip;
+    public Controller controller;
+    private GameObject toolTip;
 
     private LineRenderer laserLine;                                     // Reference to the LineRenderer component which will display our laserline
     private Color previousGameObjectColor;
@@ -21,13 +22,13 @@ public class RayCastSelector : MonoBehaviour
         laserLine = GetComponent<LineRenderer>();
         // Get and store a reference to our Camera by searching this GameObject and its parents
         fpsCam = GetComponentInParent<Camera>();
-
         Debug.Log("controller:" + controller == null);
-        Debug.Log("GraphGen:" + controller.transform.Find("plotPrefab").gameObject == null);
+        Debug.Log("GraphGen:" + controller.plotPrefab == null);
+
+        toolTip = controller.plotPrefab.transform.Find("Tooltip").gameObject;
+       
         Debug.Log("toolTip:" + toolTip == null);
-        Debug.Log("text:" + toolTip.GetComponent<TextMesh>().text);
-        toolTip = controller.transform.Find("GraphGen").gameObject.transform.Find("Tooltip").gameObject;
-        
+        Debug.Log("text:" + toolTip.GetComponent<TextMeshPro>().text);
 
     }
 
@@ -36,7 +37,6 @@ public class RayCastSelector : MonoBehaviour
     {
         // Create a vector at the center of our camera's viewport
         Vector3 rayOrigin = fpsCam.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, 0.0f));
-
 
         if (laserLine.enabled)
         {
@@ -51,7 +51,6 @@ public class RayCastSelector : MonoBehaviour
             {
                 // Set the end position for our laser line 
                 laserLine.SetPosition(1, hit.point);
-
                 //Debug.Log("color1:" + previousGameObjectColor);
 
                 if (previousGameObject != hit.collider.gameObject)
@@ -61,10 +60,15 @@ public class RayCastSelector : MonoBehaviour
                     previousGameObjectColor = previousGameObject.GetComponent<MeshRenderer>().material.color;
                 }
                 previousGameObject.GetComponent<MeshRenderer>().material.color = new Color(230, 224, 209);
+
+                toolTip.SetActive(true);
+                toolTip.GetComponent<TextMeshPro>().SetText(previousGameObject.name);
+
                 //Debug.Log("color2:"+previousGameObjectColor);
             }
             else
             {
+                toolTip.SetActive(false);
                 // If we did not hit anything, set the end of the line to a position directly in front of the camera at the distance of weaponRange
                 laserLine.SetPosition(1, rayOrigin + (fpsCam.transform.forward * rayCasteRange));
                 resetGameObject();
