@@ -1,13 +1,16 @@
 ﻿using UnityEngine;
 using Photon.Pun;
 using UnityEngine.UI;
+
+using System.Collections.Generic;
+
 /*
 * Author   : Vikram
 * Class    : DataReader
 * Function : Reading CSV data from the 'Resources' folder 
 */
 
-public class DataReader: MonoBehaviour
+public class DataReader : MonoBehaviour
 {
     public class DataPoint
     {
@@ -20,9 +23,11 @@ public class DataReader: MonoBehaviour
 
     public DataPoint[] DataFrame { get; set; }
 
+    public Dictionary<string, List<int>> ClusterMap = new Dictionary<string, List<int>>(); // cluster name as "key", cluster points as "values"
+
     public int RowCount { get; set; }
     public int ColumnCount { get; set; }
-    
+
     char[] lineSeperator = { '\n' };
     char[] textSeperator = { ',' };
 
@@ -30,19 +35,24 @@ public class DataReader: MonoBehaviour
 
     public void Start()
     {
-        string datasetname = (string)PhotonNetwork.CurrentRoom.CustomProperties["dataset"];
+        string datasetname;
+        if (PhotonNetwork.IsConnected)
+        {
+            datasetname = (string)PhotonNetwork.CurrentRoom.CustomProperties["dataset"];
+        }
+        else
+        {
+            string[] datasets = { "cancer", "haberman", "iris", "letter", "seeds", "segmentation" };
+            datasetname = datasets[2];
+        }
         DataText.text = datasetname;
         BetterStreamingAssets.Initialize();
     }
 
     public void LoadData()
     {
-        string[] datasets = {"cancer", "haberman", "iris", "letter", "seeds", "segmentation" };
-
-        string fileName = datasets[5]; // to be changed later, remove harcoded value
         bool is3DPlot = true; // to be passed to this function as a parameter
 
-        
         string fileContents = BetterStreamingAssets.ReadAllText("Dataset/" + DataText.text + ".csv");
 
         string[] data = fileContents.Split(lineSeperator);
@@ -80,7 +90,7 @@ public class DataReader: MonoBehaviour
             int tokenIndex = 0; // Eg: {'2', '3', 'A', 'Info'} -> if tokenIndex = 2, then row[tokenIndex] is 'A', keeping track of tokens in row[]
 
             DataFrame[i] = new DataPoint();
-            
+
 
             DataFrame[i].X = float.Parse(row[tokenIndex++]);
             DataFrame[i].Y = float.Parse(row[tokenIndex++]);
@@ -90,11 +100,33 @@ public class DataReader: MonoBehaviour
                 DataFrame[i].Z = float.Parse(row[tokenIndex++]);
             }
 
-            DataFrame[i].Cluster= row[tokenIndex++];
-            DataFrame[i].Tooltip = row[tokenIndex++];
+            DataFrame[i].Cluster = row[tokenIndex++];
 
-            // print(DataFrame[i].X + " " + DataFrame[i].Y + " " + DataFrame[i].Z + " " + DataFrame[i].Cluster + " " + DataFrame[i].Tooltip);
+            AddToCluster(DataFrame[i].Cluster, i);
+
+            DataFrame[i].Tooltip = "X: " + DataFrame[i].X + ", Y: " + DataFrame[i].Y + ", Z: " + DataFrame[i].Z
+                                    + ", Cluster: " + DataFrame[i].Cluster; //row[tokenIndex++]; Use this as tooltip direct from the file
+
+            //print(i + ": " + DataFrame[i].Tooltip);
         }
+
+        /*foreach (KeyValuePair<string, List<int>> pair in ClusterMap)
+        {
+            foreach(int point in pair.Value)
+            {
+                print(pair.Key + ": " + point);
+            }
+        }*/
+    }
+
+    private void AddToCluster(string cluster, int value)
+    {
+        if (!ClusterMap.ContainsKey(cluster))
+        {
+            ClusterMap.Add(cluster, new List<int>());
+        }
+
+        ClusterMap[cluster].Add(value);
     }
 
 }

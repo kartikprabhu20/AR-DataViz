@@ -171,7 +171,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         string datasetname = DatasetDropdown.captionText.text.ToLower();
         hashTable.Add("dataset", datasetname);
         PhotonNetwork.CurrentRoom.SetCustomProperties(hashTable);
-        print(datasetname);
+        //print(datasetname);
 
         LoadScatterPlotScene();
     }

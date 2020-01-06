@@ -13,6 +13,12 @@ public class ScatterplotGenerator : MonoBehaviour
     DataReader.DataPoint[] dataPoints;
 
     List<GameObject> glyphList = new List<GameObject>();
+
+    Dictionary<string, int> ClusterColorMap = new Dictionary<string, int>();
+    int colorMapCounter = 0;
+
+    Color[] clusterColors = { Color.magenta, Color.red, Color.gray, Color.yellow };
+
     int rowIndex = 0;
     bool dropFlag = false;
 
@@ -31,21 +37,16 @@ public class ScatterplotGenerator : MonoBehaviour
         rowCount = reader.RowCount;
         columnCount = reader.ColumnCount;
 
-        CreateScatterplot();
+        foreach (string clusterName in reader.ClusterMap.Keys)
+        {
+            ClusterColorMap.Add(clusterName, colorMapCounter++);
+        }
 
+        CreateScatterplot();
     }
-    
+
     void Update()
     {
-        // Used for animation, not required anymore
-        if (dropFlag)
-        {
-            foreach (GameObject glyphObj in glyphList)
-            {
-                glyphObj.GetComponent<Rigidbody>().useGravity = true;
-                glyphObj.GetComponent<SphereCollider>().enabled = true;
-            }
-        }
     }
 
     void CreateScatterplot()
@@ -62,19 +63,27 @@ public class ScatterplotGenerator : MonoBehaviour
 
         foreach (DataReader.DataPoint point in dataPoints)
         {
-            // normalize each data point
-            float x = (point.X - xMin) / (xMax - xMin);
-            float y = (point.Y - yMin) / (yMax - yMin);
-            float z = (point.Z - zMin) / (zMax - zMin);
+            float plotOffset = 0.025f; // value offset to make sure point (0, 0) is not at the origin but a little away from it
+
+            // normalize each data point & add offset
+            float x = ((point.X - xMin) / (xMax - xMin)) + plotOffset;
+            float y = ((point.Y - yMin) / (yMax - yMin)) + plotOffset;
+            float z = ((point.Z - zMin) / (zMax - zMin)) + plotOffset;
 
             objectPosition = new Vector3(x, y, z);
-            print(objectPosition);
+            //print(objectPosition); // Object Position normalized, uncomment for debugging
             glyph = Instantiate(defaultGlyph, (objectPosition - new Vector3(0.5f, 0f, 0.5f)) * plotScale, Quaternion.identity);
-            //glyph.SetActive(false);
-            glyph.name = "Data Point " + i++.ToString();
+            glyph.name = i++.ToString();
             glyph.transform.parent = pointsHolder.transform;
-            glyph.GetComponent<Renderer>().material.color = new Color(x, y, z);
-
+            print(ClusterColorMap[point.Cluster] + ": " + ClusterColorMap.Count);
+            if (ClusterColorMap[point.Cluster] < clusterColors.Length)
+            {
+                glyph.GetComponent<Renderer>().material.color = clusterColors[ClusterColorMap[point.Cluster]];
+            }
+            else
+            {
+                glyph.GetComponent<Renderer>().material.color = Color.white;
+            }
             glyphList.Add(glyph);
         }
 
@@ -94,10 +103,10 @@ public class ScatterplotGenerator : MonoBehaviour
     void AnimateDisplay()
     {
         glyphList[rowIndex++].SetActive(true);
-        if(rowIndex == rowCount-1)
+        if (rowIndex == rowCount - 1)
         {
             dropFlag = true;
-        } 
+        }
     }
 
 
@@ -111,7 +120,7 @@ public class ScatterplotGenerator : MonoBehaviour
 
         foreach (DataReader.DataPoint point in dataPoints)
         {
-            if(point.X < minValues[0])
+            if (point.X < minValues[0])
             {
                 minValues[0] = point.X;
             }
