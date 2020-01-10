@@ -113,64 +113,64 @@ public class SettingsManager : MonoBehaviour
 
     public void onGridToggleChanged(Toggle toggle)
     {
-        GameObject grids = scatterplotGenerator.getGraphGen().transform.Find("Grid").gameObject;
+        GameObject grids = scatterplotGenerator.getGraphGen().transform.Find("Planes").gameObject;
         grids.SetActive(toggle.isOn);
     }
 
-    public void onGridSliderChanged(Slider slider)
-    {
-        int gridSize = (int)slider.value;
-        GameObject graphGen = scatterplotGenerator.getGraphGen();
-        GameObject grids = graphGen.transform.Find("Grid").gameObject;
-        GameObject poles = graphGen.transform.Find("Poles").gameObject;
+    //public void onGridSliderChanged(Slider slider)
+    //{
+    //    int gridSize = (int)slider.value;
+    //    GameObject graphGen = scatterplotGenerator.getGraphGen();
+    //    GameObject grids = graphGen.transform.Find("Grid").gameObject;
+    //    GameObject poles = graphGen.transform.Find("Poles").gameObject;
 
-        GameObject poleY = poles.transform.Find("PoleY").gameObject;
-        GameObject poleZ = poles.transform.Find("PoleZ").gameObject;
+    //    GameObject poleY = poles.transform.Find("PoleY").gameObject;
+    //    GameObject poleZ = poles.transform.Find("PoleZ").gameObject;
 
-        //Debug.Log("poleY:" + poleY.transform.position);
-        //Debug.Log("poleZ:" + poleZ.transform.position);
+    //    //Debug.Log("poleY:" + poleY.transform.position);
+    //    //Debug.Log("poleZ:" + poleZ.transform.position);
 
-        GameObject yParallel = grids.transform.Find("yParallel").gameObject;
-        GameObject yParallel2 = grids.transform.Find("yParallel2").gameObject;
+    //    GameObject yParallel = grids.transform.Find("yParallel").gameObject;
+    //    GameObject yParallel2 = grids.transform.Find("yParallel2").gameObject;
 
-        //Debug.Log("poleY:" + yParallel.transform.position);
-        //Debug.Log("poleZ:" + yParallel2.transform.position);
+    //    //Debug.Log("poleY:" + yParallel.transform.position);
+    //    //Debug.Log("poleZ:" + yParallel2.transform.position);
 
-        GameObject xParallel = grids.transform.Find("xParallel").gameObject;
-        GameObject xParallel2 = grids.transform.Find("xParallel2").gameObject;
-        GameObject zParallel = grids.transform.Find("zParallel").gameObject;
+    //    GameObject xParallel = grids.transform.Find("xParallel").gameObject;
+    //    GameObject xParallel2 = grids.transform.Find("xParallel2").gameObject;
+    //    GameObject zParallel = grids.transform.Find("zParallel").gameObject;
 
-        float plotscale = graphGen.transform.localScale.x;
+    //    float plotscale = graphGen.transform.localScale.x;
 
-        Destroy(tempGrid);
-        tempGrid = new GameObject();
-        Instantiate(tempGrid, graphGen.transform.position, Quaternion.identity);
-        tempGrid.transform.rotation = grids.transform.rotation;
-        tempGrid.transform.parent = grids.transform;
+    //    Destroy(tempGrid);
+    //    tempGrid = new GameObject();
+    //    Instantiate(tempGrid, graphGen.transform.position, Quaternion.identity);
+    //    tempGrid.transform.rotation = grids.transform.rotation;
+    //    tempGrid.transform.parent = grids.transform;
 
-        for (int i = 1; i < gridSize; i++)
-        {
-            GameObject gridLineVertical = Instantiate(yParallel, new Vector3(yParallel.transform.position.x + i * (yParallel2.transform.position.x - yParallel.transform.position.x) / gridSize, yParallel.transform.position.y, yParallel.transform.position.z), Quaternion.identity);
-            gridLineVertical.transform.localScale *= plotscale;
-            gridLineVertical.transform.rotation = tempGrid.transform.rotation;
-            gridLineVertical.transform.parent = tempGrid.transform;
+    //    for (int i = 1; i < gridSize; i++)
+    //    {
+    //        GameObject gridLineVertical = Instantiate(yParallel, new Vector3(yParallel.transform.position.x + i * (yParallel2.transform.position.x - yParallel.transform.position.x) / gridSize, yParallel.transform.position.y, yParallel.transform.position.z), Quaternion.identity);
+    //        gridLineVertical.transform.localScale *= plotscale;
+    //        gridLineVertical.transform.rotation = tempGrid.transform.rotation;
+    //        gridLineVertical.transform.parent = tempGrid.transform;
 
-            gridLineVertical = Instantiate(yParallel, new Vector3(yParallel.transform.position.x, yParallel.transform.position.y, yParallel.transform.position.z + i * (poleY.transform.position.z - yParallel.transform.position.z) / gridSize), Quaternion.identity);
-            gridLineVertical.transform.localScale *= plotscale;
-            gridLineVertical.transform.rotation = tempGrid.transform.rotation;
-            gridLineVertical.transform.parent = tempGrid.transform;
+    //        gridLineVertical = Instantiate(yParallel, new Vector3(yParallel.transform.position.x, yParallel.transform.position.y, yParallel.transform.position.z + i * (poleY.transform.position.z - yParallel.transform.position.z) / gridSize), Quaternion.identity);
+    //        gridLineVertical.transform.localScale *= plotscale;
+    //        gridLineVertical.transform.rotation = tempGrid.transform.rotation;
+    //        gridLineVertical.transform.parent = tempGrid.transform;
 
-            GameObject gridLineHorizontal = Instantiate(zParallel, new Vector3(zParallel.transform.position.x, zParallel.transform.position.y + i * (poleZ.transform.position.y - zParallel.transform.position.y) / gridSize, zParallel.transform.position.z), Quaternion.identity);
-            gridLineHorizontal.transform.localScale *= plotscale;
-            //gridLineHorizontal.transform.rotation = tempGrid.transform.rotation;
-            gridLineHorizontal.transform.parent = tempGrid.transform;
+    //        GameObject gridLineHorizontal = Instantiate(zParallel, new Vector3(zParallel.transform.position.x, zParallel.transform.position.y + i * (poleZ.transform.position.y - zParallel.transform.position.y) / gridSize, zParallel.transform.position.z), Quaternion.identity);
+    //        gridLineHorizontal.transform.localScale *= plotscale;
+    //        //gridLineHorizontal.transform.rotation = tempGrid.transform.rotation;
+    //        gridLineHorizontal.transform.parent = tempGrid.transform;
 
-            gridLineHorizontal = Instantiate(xParallel, new Vector3(xParallel.transform.position.x, xParallel.transform.position.y + i * (xParallel2.transform.position.y - xParallel.transform.position.y) / gridSize, xParallel.transform.position.z), Quaternion.identity);
-            gridLineHorizontal.transform.localScale *= plotscale;
-            //gridLineHorizontal.transform.rotation = tempGrid.transform.rotation;
-            gridLineHorizontal.transform.parent = tempGrid.transform;
-        }
+    //        gridLineHorizontal = Instantiate(xParallel, new Vector3(xParallel.transform.position.x, xParallel.transform.position.y + i * (xParallel2.transform.position.y - xParallel.transform.position.y) / gridSize, xParallel.transform.position.z), Quaternion.identity);
+    //        gridLineHorizontal.transform.localScale *= plotscale;
+    //        //gridLineHorizontal.transform.rotation = tempGrid.transform.rotation;
+    //        gridLineHorizontal.transform.parent = tempGrid.transform;
+    //    }
 
-    }
+    //}
 
 }

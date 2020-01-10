@@ -10,7 +10,12 @@ public class RayCastSelector : MonoBehaviour
     public Transform rayShooterPosition;                                // Holds a reference to the end of ray shooter, marking the muzzle location of the shooter
     public Camera fpsCam;                                               // Holds a reference to the first person camera
     public Controller controller;
-    private GameObject toolTip;
+    private GameObject graphGen;
+    private GameObject tooltips;
+    private GameObject mainToolTip;
+    private GameObject xyToolTip;
+    private GameObject yzToolTip;
+    private GameObject xzToolTip;
 
     private LineRenderer laserLine;                                     // Reference to the LineRenderer component which will display our laserline
     private Color previousGameObjectColor;
@@ -23,12 +28,17 @@ public class RayCastSelector : MonoBehaviour
         // Get and store a reference to our Camera by searching this GameObject and its parents
         fpsCam = GetComponentInParent<Camera>();
         Debug.Log("controller:" + controller == null);
-        Debug.Log("GraphGen:" + controller.plotPrefab == null);
+        graphGen = controller.plotPrefab;
+        Debug.Log("GraphGen:" + graphGen == null);
 
-        toolTip = controller.plotPrefab.transform.Find("Tooltip").gameObject;
-       
-        Debug.Log("toolTip:" + toolTip == null);
-        Debug.Log("text:" + toolTip.GetComponent<TextMeshPro>().text);
+        tooltips = controller.plotPrefab.transform.Find("Tooltips").gameObject;
+        mainToolTip = tooltips.transform.Find("MainTooltip").gameObject;
+        xyToolTip = tooltips.transform.Find("XYTooltip").gameObject;
+        xzToolTip = tooltips.transform.Find("XZTooltip").gameObject;
+        yzToolTip = tooltips.transform.Find("YZTooltip").gameObject;
+
+        Debug.Log("toolTip:" + mainToolTip == null);
+        Debug.Log("text:" + mainToolTip.GetComponent<TextMeshPro>().text);
 
     }
 
@@ -61,14 +71,16 @@ public class RayCastSelector : MonoBehaviour
                 }
                 previousGameObject.GetComponent<MeshRenderer>().material.color = new Color(230, 224, 209);
 
-                toolTip.SetActive(true);
-                toolTip.GetComponent<TextMeshPro>().SetText(previousGameObject.name);
-
+                tooltips.SetActive(true);
+                mainToolTip.GetComponent<TextMeshPro>().SetText(previousGameObject.name);
+                xyToolTip.GetComponent<TextMeshPro>().SetText(previousGameObject.name);
+                yzToolTip.GetComponent<TextMeshPro>().SetText(previousGameObject.name);
+                xzToolTip.GetComponent<TextMeshPro>().SetText(previousGameObject.name);
                 //Debug.Log("color2:"+previousGameObjectColor);
             }
             else
             {
-                toolTip.SetActive(false);
+                tooltips.SetActive(false);
                 // If we did not hit anything, set the end of the line to a position directly in front of the camera at the distance of weaponRange
                 laserLine.SetPosition(1, rayOrigin + (fpsCam.transform.forward * rayCasteRange));
                 resetGameObject();
