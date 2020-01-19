@@ -1,0 +1,5 @@
+﻿
+interface IPlotLoad
+{
+    void callback();
+}
